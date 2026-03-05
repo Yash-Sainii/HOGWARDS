@@ -1,0 +1,2343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Wizarding World - Immersive Experience</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital@0;1&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+
+             
+            .house-emblem {
+                width: 70px;
+                height: 70px;
+                margin: 0 auto 15px auto;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                overflow: hidden;
+            }
+
+            .house-emblem img{
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
+            .house-card img{
+                max-width:70px !important;
+                max-height:70px !important;
+                object-fit:contain;
+            }
+        }
+
+        :root {
+            --gold: #D4AF37;
+            --deep-gold: #8B7500;
+            --dark-bg: #0A0E27;
+            --darker-bg: #050810;
+            --emerald: #2D5A3D;
+            --wizard-blue: #1A3A52;
+            --crimson: #8B0000;
+            --silver: #E8E8E8;
+            --light-gold: #FFE8A8;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            background: var(--darker-bg);
+            color: var(--silver);
+            font-family: 'Crimson Text', serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            overflow-x: hidden;
+        }
+
+        /* ==================== CURSOR EFFECTS ==================== */
+        body {
+            cursor: none;
+        }
+
+        .wand-cursor {
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            width: 20px;
+            height: 20px;
+            mix-blend-mode: screen;
+        }
+
+        .wand-cursor::before {
+            content: '';
+            position: absolute;
+            width: 4px;
+            height: 15px;
+            background: linear-gradient(180deg, var(--gold), transparent);
+            left: 8px;
+            top: -10px;
+            border-radius: 2px;
+            box-shadow: 0 0 10px var(--gold), 0 0 20px rgba(212, 175, 55, 0.5);
+        }
+
+        .wand-cursor::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: radial-gradient(circle, var(--gold), transparent);
+            left: 6px;
+            top: 0;
+            border-radius: 50%;
+            box-shadow: 0 0 15px var(--gold), 0 0 30px rgba(212, 175, 55, 0.6);
+        }
+
+        .magic-trail {
+            position: fixed;
+            pointer-events: none;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--wizard-blue), transparent);
+            box-shadow: 0 0 10px var(--wizard-blue);
+            animation: fadeTrail 0.8s ease-out forwards;
+            z-index: 9999;
+        }
+
+        @keyframes fadeTrail {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+        }
+
+        .spark-burst {
+            position: fixed;
+            pointer-events: none;
+            width: 4px;
+            height: 4px;
+            background: var(--gold);
+            border-radius: 50%;
+            box-shadow: 0 0 6px var(--gold);
+            animation: sparkFly 1.2s ease-out forwards;
+        }
+
+        @keyframes sparkFly {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tx), var(--ty)) scale(0);
+            }
+        }
+
+        /* ==================== FOG & ATMOSPHERE ==================== */
+        .fog-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, transparent 0%, rgba(10, 14, 39, 0.5) 100%);
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .fog-bottom {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(to bottom, transparent, rgba(10, 14, 39, 0.95));
+            pointer-events: none;
+            z-index: 101;
+        }
+
+        /* ==================== LOADING SCREEN ==================== */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--darker-bg);
+            z-index: 5000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            transition: opacity 0.8s ease-out;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-text {
+            font-family: 'Cinzel', serif;
+            font-size: 2.5rem;
+            color: var(--gold);
+            text-align: center;
+            letter-spacing: 4px;
+            opacity: 0;
+            animation: fadeInText 1.5s ease-out 0.5s forwards;
+            text-shadow: 0 0 40px var(--gold), 0 0 80px rgba(212, 175, 55, 0.5);
+        }
+
+        @keyframes fadeInText {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .loading-dots {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            background: var(--gold);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite;
+            box-shadow: 0 0 10px var(--gold);
+        }
+
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(1); opacity: 0.5; }
+            40% { transform: scale(1.2); opacity: 1; }
+        }
+
+        /* ==================== LANDING PAGE ==================== */
+        .landing-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--darker-bg) 0%, var(--wizard-blue) 50%, var(--darker-bg) 100%);
+            overflow: hidden;
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 0.8s ease-out;
+        }
+
+        .landing-page.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .castle-view {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1920 1080'%3E%3Crect fill='%23050810' width='1920' height='1080'/%3E%3Cpath fill='%23142a4d' d='M0 600 Q 480 500 960 550 T 1920 600 L 1920 1080 L 0 1080 Z'/%3E%3C/svg%3E") center/cover no-repeat;
+            opacity: 0;
+            animation: castleAppear 3s ease-out 1s forwards;
+        }
+
+        @keyframes castleAppear {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .castle {
+            position: absolute;
+            bottom: 200px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 8rem;
+            opacity: 0;
+            animation: castleRise 4s ease-out 1.5s forwards;
+            text-shadow: 0 0 50px var(--gold), 0 0 100px rgba(212, 175, 55, 0.5);
+            filter: drop-shadow(0 0 30px var(--wizard-blue));
+        }
+
+        @keyframes castleRise {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        .particles-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--gold);
+            border-radius: 50%;
+            opacity: 0.6;
+            box-shadow: 0 0 6px var(--gold);
+        }
+
+        .landing-content {
+            position: relative;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding-bottom: 150px;
+            z-index: 10;
+        }
+
+        .landing-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 4.5rem;
+            font-weight: 900;
+            color: var(--gold);
+            text-align: center;
+            letter-spacing: 8px;
+            opacity: 0;
+            animation: titleAppear 2s ease-out 2s forwards;
+            text-shadow: 0 0 50px var(--gold), 0 0 100px rgba(212, 175, 55, 0.6);
+            margin-bottom: 60px;
+        }
+
+        @keyframes titleAppear {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .enter-button {
+            position: relative;
+            padding: 18px 60px;
+            font-family: 'Cinzel', serif;
+            font-size: 1.3rem;
+            color: var(--darker-bg);
+            background: var(--gold);
+            border: 3px solid var(--gold);
+            cursor: pointer;
+            letter-spacing: 4px;
+            font-weight: 700;
+            opacity: 0;
+            animation: buttonAppear 2s ease-out 2.8s forwards;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 40px var(--gold), inset 0 0 20px rgba(255, 255, 255, 0.3);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        @keyframes buttonAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .enter-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 60px var(--gold), inset 0 0 30px rgba(255, 255, 255, 0.5);
+            letter-spacing: 6px;
+        }
+
+        .enter-button:active {
+            transform: scale(0.95);
+        }
+
+        /* ==================== NAVIGATION BAR ==================== */
+        .nav-bar {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(217, 179, 102, 0.95);
+            padding: 20px 40px;
+            border-radius: 15px;
+            display: flex;
+            gap: 35px;
+            z-index: 2000;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(139, 117, 0, 0.3);
+            border: 2px solid var(--deep-gold);
+            opacity: 0;
+            animation: mapAppear 1s ease-out 3.5s forwards;
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes mapAppear {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        .nav-item {
+            position: relative;
+            cursor: pointer;
+            color: var(--darker-bg);
+            font-family: 'Cinzel', serif;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            letter-spacing: 2px;
+        }
+
+        .nav-item:hover {
+            background: rgba(212, 175, 55, 0.6);
+            transform: scale(1.15);
+        }
+
+        .nav-item.active {
+            background: var(--deep-gold);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+
+        /* ==================== MAIN CONTENT ==================== */
+        .main-content {
+            position: relative;
+            width: 100%;
+        }
+
+        section {
+            min-height: 100vh;
+            padding: 120px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: linear-gradient(to bottom, var(--dark-bg), transparent);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            font-weight: 900;
+            color: var(--gold);
+            margin-bottom: 60px;
+            text-align: center;
+            letter-spacing: 4px;
+            text-shadow: 0 0 40px var(--gold);
+            position: relative;
+            z-index: 5;
+        }
+
+        h1::before {
+            content: '✦ ';
+            margin-right: 20px;
+        }
+
+        h1::after {
+            content: ' ✦';
+            margin-left: 20px;
+        }
+
+        .section-glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: radial-gradient(ellipse at center, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        /* ==================== HOUSES SECTION ==================== */
+        .houses-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            width: 100%;
+            max-width: 1300px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .house-card {
+            background: rgba(30, 30, 50, 0.9);
+            border: 3px solid;
+            padding: 50px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            min-height: 350px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .house-card::before {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: -100%;
+            width: 300%;
+            height: 300%;
+            background: radial-gradient(circle, var(--house-color) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 0;
+        }
+
+        .house-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 1;
+        }
+
+        .house-card:hover {
+            transform: translateY(-15px) rotateX(5deg);
+            box-shadow: 0 20px 50px var(--house-color), inset 0 0 30px rgba(212, 175, 55, 0.2);
+            border-color: var(--house-color);
+        }
+
+        .house-card:hover::before {
+            opacity: 0.15;
+        }
+
+        .house-card:hover::after {
+            opacity: 1;
+        }
+
+        .house-card.gryffindor { --house-color: #DC143C; border-color: #DC143C; }
+        .house-card.slytherin { --house-color: #2D5A3D; border-color: #2D5A3D; }
+        .house-card.ravenclaw { --house-color: #0E1A40; border-color: #0E1A40; }
+        .house-card.hufflepuff { --house-color: #F1C40F; border-color: #F1C40F; }
+
+        .house-header {
+            position: relative;
+            z-index: 5;
+            margin-bottom: 20px;
+        }
+
+        .house-emblem {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+
+        .house-name {
+            font-family: 'Cinzel', serif;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            color: var(--house-color);
+            text-shadow: 0 0 25px var(--house-color);
+        }
+
+        .house-motto {
+            font-style: italic;
+            color: var(--wizard-blue);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+
+        .house-info {
+            color: var(--silver);
+            line-height: 1.9;
+            position: relative;
+            z-index: 5;
+            font-size: 0.95rem;
+        }
+
+        .house-info p {
+            margin-bottom: 12px;
+        }
+
+        .house-info strong {
+            color: var(--house-color);
+        }
+
+        /* ==================== SPELLS SECTION ==================== */
+        .spell-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            width: 100%;
+            max-width: 1300px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .spell-card {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(26, 58, 82, 0.25));
+            border: 2px solid var(--gold);
+            padding: 35px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+            min-height: 280px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            backdrop-filter: blur(10px);
+        }
+
+        .spell-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--gold) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .spell-card:hover {
+            transform: rotateY(8deg) rotateX(-8deg) translateY(-10px) scale(1.05);
+            box-shadow: 0 0 50px rgba(212, 175, 55, 0.4), inset 0 0 20px rgba(212, 175, 55, 0.1);
+            border-color: var(--silver);
+        }
+
+        .spell-card:hover::before {
+            opacity: 0.2;
+        }
+
+        .spell-name {
+            font-family: 'Cinzel', serif;
+            font-size: 1.6rem;
+            color: var(--gold);
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 5;
+            text-shadow: 0 0 15px var(--gold);
+        }
+
+        .spell-effect {
+            color: var(--light-gold);
+            font-size: 0.9rem;
+            font-style: italic;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .spell-description {
+            color: var(--silver);
+            font-size: 0.9rem;
+            line-height: 1.7;
+            position: relative;
+            z-index: 5;
+        }
+
+        /* ==================== CHARACTERS SECTION ==================== */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            width: 100%;
+            max-width: 1500px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .portrait-frame {
+            aspect-ratio: 3 / 4;
+            border: 6px solid var(--gold);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+            background: linear-gradient(135deg, var(--deep-gold), var(--darker-bg));
+            box-shadow: 0 0 30px var(--gold), inset 0 0 25px rgba(0, 0, 0, 0.5);
+            transition: all 0.4s ease;
+            perspective: 1000px;
+        }
+
+        .portrait-frame:hover {
+            transform: scale(1.08) rotateY(5deg) translateZ(20px);
+            box-shadow: 0 0 60px var(--gold), inset 0 0 40px rgba(212, 175, 55, 0.3);
+        }
+
+        .portrait-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.4s ease;
+        }
+
+        .portrait-frame:hover img {
+            filter: brightness(1.1) saturate(1.2);
+        }
+
+        .portrait-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .portrait-frame:hover .portrait-overlay {
+            opacity: 1;
+        }
+
+        .portrait-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(212, 175, 55, 0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .portrait-frame:hover .portrait-glow {
+            opacity: 1;
+        }
+
+        .portrait-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(5, 8, 16, 0.98), transparent 80%);
+            padding: 40px 20px 20px;
+            color: var(--silver);
+            transform: translateY(100%);
+            transition: transform 0.4s ease;
+            z-index: 4;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .portrait-frame:hover .portrait-info {
+            transform: translateY(0);
+        }
+
+        .character-name {
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            margin-bottom: 5px;
+            font-size: 1.4rem;
+            text-shadow: 0 0 15px var(--gold);
+            letter-spacing: 2px;
+        }
+
+        .character-role {
+            font-size: 0.9rem;
+            color: var(--light-gold);
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+
+        .character-house {
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
+            color: var(--wizard-blue);
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .character-details {
+            display: none;
+            font-size: 0.8rem;
+            line-height: 1.6;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .portrait-frame:hover .character-details {
+            display: block;
+        }
+
+        .character-details p {
+            margin-bottom: 8px;
+            color: var(--silver);
+        }
+
+        .character-details strong {
+            color: var(--light-gold);
+        }
+
+        /* ==================== CHARACTER MODAL ==================== */
+        .character-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 8, 16, 0.9);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .character-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(30, 30, 50, 0.95), rgba(26, 58, 82, 0.8));
+            border: 3px solid var(--gold);
+            border-radius: 20px;
+            padding: 60px 50px;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            box-shadow: 0 0 60px var(--gold), inset 0 0 40px rgba(212, 175, 55, 0.1);
+            animation: modalAppear 0.5s ease-out;
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.8) rotateY(180deg);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) rotateY(0);
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 3rem;
+            cursor: pointer;
+            color: var(--gold);
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            transform: scale(1.2) rotate(90deg);
+            color: var(--silver);
+        }
+
+        .modal-body {
+            text-align: center;
+        }
+
+        .modal-emoji {
+            font-size: 8rem;
+            margin-bottom: 20px;
+            animation: emojiFloat 2s ease-in-out infinite;
+        }
+
+        @keyframes emojiFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .modal-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem;
+            color: var(--gold);
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px var(--gold);
+            letter-spacing: 2px;
+        }
+
+        .modal-role {
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            color: var(--light-gold);
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .modal-divider {
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            margin: 25px auto;
+        }
+
+        .modal-description {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: var(--silver);
+            text-align: left;
+        }
+
+        .modal-description p {
+            margin-bottom: 15px;
+        }
+
+        /* Dark Lord Voldemort Special Styling */
+        .portrait-frame.dark-lord {
+            border-color: #8B0000;
+            box-shadow: 0 0 30px #8B0000, inset 0 0 25px rgba(139, 0, 0, 0.3);
+        }
+
+        .portrait-frame.dark-lord:hover {
+            border-color: #FF0000;
+            box-shadow: 0 0 60px #FF0000, inset 0 0 40px rgba(255, 0, 0, 0.3);
+        }
+
+        /* ==================== SORTING HAT SECTION ==================== */
+        .sorting-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 50px;
+            position: relative;
+            z-index: 5;
+            max-width: 600px;
+        }
+
+        .sorting-input {
+            font-family: 'Crimson Text', serif;
+            font-size: 1.3rem;
+            padding: 18px 35px;
+            border: 3px solid var(--gold);
+            background: rgba(0, 0, 0, 0.8);
+            color: var(--gold);
+            border-radius: 10px;
+            text-align: center;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px var(--wizard-blue);
+        }
+
+        .sorting-input:focus {
+            outline: none;
+            box-shadow: 0 0 40px var(--gold);
+            border-color: var(--silver);
+            color: var(--silver);
+            background: rgba(0, 0, 0, 0.95);
+        }
+
+        .sorting-input::placeholder {
+            color: var(--wizard-blue);
+        }
+
+        .sort-button {
+            padding: 18px 50px;
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            color: var(--darker-bg);
+            background: var(--gold);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 30px var(--gold);
+            letter-spacing: 3px;
+            font-weight: 700;
+        }
+
+        .sort-button:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 50px var(--gold);
+        }
+
+        .sorting-hat {
+            font-size: 7rem;
+            opacity: 0;
+            transform: translateY(100px) rotateZ(-15deg);
+            filter: drop-shadow(0 0 40px var(--gold));
+            text-shadow: 0 0 25px rgba(212, 175, 55, 0.6);
+        }
+
+        .hat-appearing {
+            animation: hatDrop 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes hatDrop {
+            from {
+                opacity: 0;
+                transform: translateY(100px) rotateZ(-15deg);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) rotateZ(0deg);
+            }
+        }
+
+        .hat-shaking {
+            animation: hatShake 0.6s ease-in-out;
+        }
+
+        @keyframes hatShake {
+            0%, 100% { transform: rotateZ(0deg); }
+            25% { transform: rotateZ(-12deg); }
+            75% { transform: rotateZ(12deg); }
+        }
+
+        .house-reveal {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            letter-spacing: 4px;
+            opacity: 0;
+            animation: houseReveal 1s ease-out 1.8s forwards;
+            text-shadow: 0 0 40px currentColor;
+        }
+
+        @keyframes houseReveal {
+            from {
+                opacity: 0;
+                transform: scale(0.5) rotateY(180deg);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) rotateY(0);
+            }
+        }
+
+        /* ==================== GREAT HALL ==================== */
+        .floating-candles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        .candle {
+            position: absolute;
+            width: 25px;
+            height: 50px;
+            background: linear-gradient(180deg, var(--gold) 0%, #FFD700 50%, var(--deep-gold) 100%);
+            border-radius: 50% 50% 40% 40%;
+            opacity: 0.8;
+            animation: floatCandle 8s ease-in-out infinite;
+            box-shadow: 0 0 40px var(--gold), 0 0 80px rgba(212, 175, 55, 0.6);
+            filter: drop-shadow(0 0 25px var(--gold));
+        }
+
+        @keyframes floatCandle {
+            0%, 100% { transform: translateY(0) translateX(0) rotateZ(-5deg); }
+            50% { transform: translateY(-100px) translateX(50px) rotateZ(5deg); }
+        }
+
+        .hall-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+
+        .hall-text {
+            font-size: 1.3rem;
+            color: var(--silver);
+            line-height: 2;
+            max-width: 900px;
+            margin: 50px auto;
+        }
+
+        /* ==================== PATRONUS SECTION ==================== */
+        .patronus-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .patronus-text {
+            color: var(--silver);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            max-width: 700px;
+            line-height: 1.8;
+            text-align: center;
+        }
+
+        .patronus-button {
+            padding: 22px 60px;
+            font-family: 'Cinzel', serif;
+            font-size: 1.4rem;
+            color: var(--darker-bg);
+            background: linear-gradient(135deg, var(--gold), #FFE8A8);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 50px var(--gold);
+            letter-spacing: 3px;
+            font-weight: 700;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .patronus-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 80px var(--gold);
+        }
+
+        .patronus {
+            position: fixed;
+            font-size: 5rem;
+            opacity: 0;
+            filter: drop-shadow(0 0 30px var(--silver)) brightness(1.4);
+            animation: patronusRun 4s ease-out forwards;
+            pointer-events: none;
+            z-index: 1500;
+        }
+
+        @keyframes patronusRun {
+            0% {
+                opacity: 1;
+                transform: translateX(-100px) translateY(-100px) scaleX(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(100vw) translateY(100px) scaleX(-1);
+            }
+        }
+
+        .patronus-trail {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: var(--silver);
+            border-radius: 50%;
+            opacity: 0.8;
+            pointer-events: none;
+            box-shadow: 0 0 12px var(--silver);
+            animation: patronusTrailFade 1.2s ease-out forwards;
+        }
+
+        @keyframes patronusTrailFade {
+            from {
+                opacity: 0.8;
+                transform: scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: scale(0);
+            }
+        }
+
+        /* ==================== TIMELINE ==================== */
+        .timeline-wrapper {
+            max-width: 1000px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--gold), transparent);
+            z-index: 1;
+        }
+
+        .timeline-items {
+            display: flex;
+            flex-direction: column;
+            gap: 80px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .timeline-item {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 50px;
+            align-items: center;
+            opacity: 0;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content {
+            grid-column: 1;
+            text-align: right;
+        }
+
+        .timeline-item:nth-child(even) .timeline-content {
+            grid-column: 3;
+            text-align: left;
+        }
+
+        .timeline-content {
+            background: rgba(30, 30, 50, 0.9);
+            padding: 35px;
+            border: 2px solid var(--gold);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .timeline-content:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 40px var(--gold);
+        }
+
+        .timeline-year {
+            font-family: 'Cinzel', serif;
+            font-size: 2rem;
+            color: var(--gold);
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px var(--gold);
+        }
+
+        .timeline-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.3rem;
+            color: var(--silver);
+            margin-bottom: 15px;
+        }
+
+        .timeline-description {
+            color: var(--wizard-blue);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .timeline-dot {
+            width: 20px;
+            height: 20px;
+            background: var(--gold);
+            border: 5px solid var(--darker-bg);
+            border-radius: 50%;
+            box-shadow: 0 0 25px var(--gold);
+            position: relative;
+            z-index: 10;
+        }
+
+        /* ==================== AUDIO TOGGLE ==================== */
+        .audio-toggle {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 70px;
+            height: 70px;
+            background: var(--gold);
+            border: 3px solid var(--deep-gold);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            transition: all 0.3s ease;
+            z-index: 2500;
+            box-shadow: 0 0 30px var(--gold);
+        }
+
+        .audio-toggle:hover {
+            transform: scale(1.15);
+            box-shadow: 0 0 60px var(--gold);
+        }
+
+        .audio-toggle.muted {
+            background: transparent;
+            color: var(--gold);
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 768px) {
+            .landing-title {
+                font-size: 2.8rem;
+            }
+
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .houses-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .spell-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .gallery {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .nav-bar {
+                flex-direction: column;
+                gap: 15px;
+                bottom: 20px;
+                padding: 15px 25px;
+            }
+
+            .timeline-item {
+                grid-template-columns: 1fr !important;
+            }
+
+            .timeline-line {
+                left: 25px;
+            }
+
+            .timeline-content {
+                text-align: left !important;
+                grid-column: 1 !important;
+            }
+
+            .timeline-dot {
+                grid-column: 1 !important;
+                justify-self: start;
+                margin-left: 10px;
+            }
+
+            section {
+                padding: 100px 30px;
+            }
+
+            .modal-content {
+                padding: 40px 30px;
+            }
+        }
+
+        /* ==================== SCROLL REVEAL ==================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div style="text-align: center;">
+            <div class="loading-text">✨ Loading Magical Realm ✨</div>
+            <div class="loading-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cursor -->
+    <div class="wand-cursor" id="wandCursor"></div>
+
+    <!-- Atmosphere -->
+    <div class="fog-layer"></div>
+    <div class="fog-bottom"></div>
+
+    <!-- Landing Page -->
+    <div class="landing-page" id="landingPage">
+        <div class="castle-view"></div>
+        <div class="particles-container" id="particlesContainer"></div>
+
+        <div class="landing-content">
+            <div class="castle">🏰</div>
+            <h1 class="landing-title">THE WIZARDING WORLD AWAITS</h1>
+            <button class="enter-button" id="enterButton">ENTER HOGWARTS</button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav-bar" id="navBar" style="display: none;">
+        <div class="nav-item" data-section="houses">Hogwarts</div>
+        <div class="nav-item" data-section="spells">Spellbook</div>
+        <div class="nav-item" data-section="characters">Characters</div>
+        <div class="nav-item" data-section="sorting">Sorting Hat</div>
+        <div class="nav-item" data-section="greatHall">Great Hall</div>
+        <div class="nav-item" data-section="patronus">Patronus</div>
+        <div class="nav-item" data-section="timeline">Timeline</div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Houses Section -->
+        <section id="houses" class="reveal">
+            <div class="section-glow"></div>
+            <h1>The Four Houses</h1>
+            <div class="houses-grid">
+                <div class="house-card gryffindor">
+                    <div class="house-header">
+                        <div class="house-emblem">
+                            <img src="images/gryffindor.png" alt="Gryffindor">
+                        </div>
+                        <div class="house-name">Gryffindor</div>
+                        <div class="house-motto">"Daring, nerve, and chivalry"</div>
+                    </div>
+                    <div class="house-info">
+                        <p><strong>Founder:</strong> Godric Gryffindor</p>
+                        <p><strong>Traits:</strong> Bravery, Courage, Chivalry, Daring</p>
+                        <p><strong>Notable Members:</strong> Harry Potter, Hermione Granger, Ron Weasley, Albus Dumbledore</p>
+                    </div>
+                </div>
+
+                <div class="house-card slytherin">
+                    <div class="house-header">
+                        <div class="house-emblem">
+                            <img src="images/slytherin.png" alt="Slytherin">
+                        </div>
+                        <div class="house-name">Slytherin</div>
+                        <div class="house-motto">"Cunning and ambition"</div>
+                    </div>
+                    <div class="house-info">
+                        <p><strong>Founder:</strong> Salazar Slytherin</p>
+                        <p><strong>Traits:</strong> Ambition, Cunning, Pride, Determination</p>
+                        <p><strong>Notable Members:</strong> Draco Malfoy, Severus Snape, Horace Slughorn</p>
+                    </div>
+                </div>
+
+                <div class="house-card ravenclaw">
+                    <div class="house-header">
+                        <div class="house-emblem">
+                            <img src="images/ravenclaw.png" alt="Ravenclaw">
+                        </div>
+                        <div class="house-name">Ravenclaw</div>
+                        <div class="house-motto">"Wit beyond measure"</div>
+                    </div>
+                    <div class="house-info">
+                        <p><strong>Founder:</strong> Rowena Ravenclaw</p>
+                        <p><strong>Traits:</strong> Wisdom, Wit, Creativity, Intelligence</p>
+                        <p><strong>Notable Members:</strong> Luna Lovegood, Cho Chang, Padma Patil</p>
+                    </div>
+                </div>
+
+                <div class="house-card hufflepuff">
+                    <div class="house-header">
+                        <div class="house-emblem">
+                            <img src="images/hufflepuff.png" alt="Hufflepuff">
+                        </div>
+                        <div class="house-name">Hufflepuff</div>
+                        <div class="house-motto">"Hard work, patience, loyalty"</div>
+                    </div>
+                    <div class="house-info">
+                        <p><strong>Founder:</strong> Helga Hufflepuff</p>
+                        <p><strong>Traits:</strong> Loyalty, Hard Work, Patience, Fairness</p>
+                        <p><strong>Notable Members:</strong> Cedric Diggory, Neville Longbottom</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Spells Section -->
+        <section id="spells" class="reveal">
+            <div class="section-glow"></div>
+            <h1>Spell Library</h1>
+            <div class="spell-grid">
+                <div class="spell-card">
+                    <div class="spell-name">Lumos</div>
+                    <div class="spell-effect">✨ Illumination Charm</div>
+                    <div class="spell-description">Produces bright light from the wand tip. Essential for navigating dark corridors throughout Hogwarts.</div>
+                </div>
+
+                <div class="spell-card">
+                    <div class="spell-name">Wingardium Leviosa</div>
+                    <div class="spell-effect">⬆️ Levitation Charm</div>
+                    <div class="spell-description">Makes objects float in mid-air. Requires precise wand movement and pronunciation: "Swish and flick."</div>
+                </div>
+
+                <div class="spell-card">
+                    <div class="spell-name">Expelliarmus</div>
+                    <div class="spell-effect">⚔️ Disarming Charm</div>
+                    <div class="spell-description">Disarms opponents. Harry Potter's signature spell and one of the most powerful defensive charms.</div>
+                </div>
+
+                <div class="spell-card">
+                    <div class="spell-name">Expecto Patronum</div>
+                    <div class="spell-effect">👻 Patronus Charm</div>
+                    <div class="spell-description">Conjures a Patronus to protect against Dementors. One of the most advanced spells in wizardry.</div>
+                </div>
+
+                <div class="spell-card">
+                    <div class="spell-name">Alohomora</div>
+                    <div class="spell-effect">🔓 Unlocking Charm</div>
+                    <div class="spell-description">Opens locked doors and windows. Typing "alohomora" reveals hidden secrets...</div>
+                </div>
+
+                <div class="spell-card">
+                    <div class="spell-name">Stupefy</div>
+                    <div class="spell-effect">⚡ Stunning Spell</div>
+                    <div class="spell-description">Renders targets unconscious. The primary offensive spell used in wizard duels.</div>
+                </div>
+
+                <div class="spell-card">
+                    <div class="spell-name">Accio</div>
+                    <div class="spell-effect">🎯 Summoning Charm</div>
+                    <div class="spell-description">Brings objects to the caster. One of the most useful charms for retrieving items.</div>
+                </div>
+
+                <div class="spell-card">
+                    <div class="spell-name">Obliviate</div>
+                    <div class="spell-effect">🧠 Memory Charm</div>
+                    <div class="spell-description">Erases or modifies memories. A powerful and dangerous spell used in the wizarding world.</div>
+                </div>
+
+                <div class="spell-card">
+                    <div class="spell-name">Severus</div>
+                    <div class="spell-effect">⚰️ Severing Charm</div>
+                    <div class="spell-description">Cuts through almost any substance. Used for spell cutting and defensive purposes.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Characters Section -->
+        <section id="characters" class="reveal">
+            <div class="section-glow"></div>
+            <h1>Wizarding Characters</h1>
+            <div class="gallery">
+                <!-- Harry Potter -->
+                <div class="portrait-frame" data-character="harry">
+                    <img src="images/harry.png" alt="Harry Potter" class="portrait-image" />
+                    <div class="portrait-overlay"></div>
+                    <div class="portrait-glow"></div>
+                    <div class="portrait-info">
+                        <div class="character-name">Harry Potter</div>
+                        <div class="character-role">The Chosen One</div>
+                        <div class="character-house">🦁 Gryffindor</div>
+                        <div class="character-details">
+                            <p><strong>Born:</strong> 31 July 1980</p>
+                            <p><strong>Patronus:</strong> Stag</p>
+                            <p><strong>Wand:</strong> Phoenix feather, 11"</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hermione Granger -->
+                <div class="portrait-frame" data-character="hermione">
+                    <img src="images/hermione.png" alt="Hermione Granger" class="portrait-image" />
+                    <div class="portrait-overlay"></div>
+                    <div class="portrait-glow"></div>
+                    <div class="portrait-info">
+                        <div class="character-name">Hermione Granger</div>
+                        <div class="character-role">Brightest Witch</div>
+                        <div class="character-house">🦁 Gryffindor</div>
+                        <div class="character-details">
+                            <p><strong>Born:</strong> 19 September 1979</p>
+                            <p><strong>Patronus:</strong> Otter</p>
+                            <p><strong>Wand:</strong> Vine wood, 10¾"</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ron Weasley -->
+                <div class="portrait-frame" data-character="ron">
+                    <img src="images/ron.png" alt="Ron Weasley" class="portrait-image" />
+                    <div class="portrait-overlay"></div>
+                    <div class="portrait-glow"></div>
+                    <div class="portrait-info">
+                        <div class="character-name">Ron Weasley</div>
+                        <div class="character-role">Loyal Friend</div>
+                        <div class="character-house">🦁 Gryffindor</div>
+                        <div class="character-details">
+                            <p><strong>Born:</strong> 1 March 1980</p>
+                            <p><strong>Patronus:</strong> Jack Russell Terrier</p>
+                            <p><strong>Wand:</strong> Ash & unicorn hair, 12"</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Albus Dumbledore -->
+                <div class="portrait-frame" data-character="dumbledore">
+                    <img src="images/dumbledore.png" alt="Albus Dumbledore" class="portrait-image" />
+                    <div class="portrait-overlay"></div>
+                    <div class="portrait-glow"></div>
+                    <div class="portrait-info">
+                        <div class="character-name">Albus Dumbledore</div>
+                        <div class="character-role">Headmaster</div>
+                        <div class="character-house">🦁 Gryffindor</div>
+                        <div class="character-details">
+                            <p><strong>Born:</strong> August 1881</p>
+                            <p><strong>Patronus:</strong> Phoenix</p>
+                            <p><strong>Wand:</strong> Elder wood, 15"</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Severus Snape -->
+                <div class="portrait-frame" data-character="snape">
+                    <img src="images/snape.png" alt="Severus Snape" class="portrait-image" />
+                    <div class="portrait-overlay"></div>
+                    <div class="portrait-glow"></div>
+                    <div class="portrait-info">
+                        <div class="character-name">Severus Snape</div>
+                        <div class="character-role">Potion Master</div>
+                        <div class="character-house">🐍 Slytherin</div>
+                        <div class="character-details">
+                            <p><strong>Born:</strong> 9 January 1960</p>
+                            <p><strong>Patronus:</strong> Doe</p>
+                            <p><strong>Wand:</strong> Black walnut, 13½"</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Luna Lovegood -->
+                <div class="portrait-frame" data-character="luna">
+                    <img src="images/luna.png" alt="Luna Lovegood" class="portrait-image" />
+                    <div class="portrait-overlay"></div>
+                    <div class="portrait-glow"></div>
+                    <div class="portrait-info">
+                        <div class="character-name">Luna Lovegood</div>
+                        <div class="character-role">The Dreamer</div>
+                        <div class="character-house">🦅 Ravenclaw</div>
+                        <div class="character-details">
+                            <p><strong>Born:</strong> 13 February 1981</p>
+                            <p><strong>Patronus:</strong> Hare</p>
+                            <p><strong>Wand:</strong> Spruce & unicorn hair</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Draco Malfoy -->
+                <div class="portrait-frame" data-character="draco">
+                    <img src="images/draco.png" alt="Draco Malfoy" class="portrait-image" />
+                    <div class="portrait-overlay"></div>
+                    <div class="portrait-glow"></div>
+                    <div class="portrait-info">
+                        <div class="character-name">Draco Malfoy</div>
+                        <div class="character-role">Rival & Adversary</div>
+                        <div class="character-house">🐍 Slytherin</div>
+                        <div class="character-details">
+                            <p><strong>Born:</strong> 5 June 1980</p>
+                            <p><strong>Patronus:</strong> None</p>
+                            <p><strong>Wand:</strong> Hawthorn & unicorn hair</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rubeus Hagrid -->
+                <div class="portrait-frame" data-character="hagrid">
+                    <img src="images/hagrid.png" alt="Rubeus Hagrid" class="portrait-image" />
+                    <div class="portrait-overlay"></div>
+                    <div class="portrait-glow"></div>
+                    <div class="portrait-info">
+                        <div class="character-name">Rubeus Hagrid</div>
+                        <div class="character-role">Gamekeeper</div>
+                        <div class="character-house">🦁 Gryffindor</div>
+                        <div class="character-details">
+                            <p><strong>Born:</strong> 6 December 1928</p>
+                            <p><strong>Patronus:</strong> Boarhound</p>
+                            <p><strong>Passion:</strong> Magical Creatures</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ginny Weasley -->
+                <div class="portrait-frame" data-character="ginny">
+                    <img src="images/ginny.png" alt="Ginny Weasley" class="portrait-image" />
+                    <div class="portrait-overlay"></div>
+                    <div class="portrait-glow"></div>
+                    <div class="portrait-info">
+                        <div class="character-name">Ginny Weasley</div>
+                        <div class="character-role">Seeker & Warrior</div>
+                        <div class="character-house">🦁 Gryffindor</div>
+                        <div class="character-details">
+                            <p><strong>Born:</strong> 11 August 1981</p>
+                            <p><strong>Patronus:</strong> Horse</p>
+                            <p><strong>Talent:</strong> Quidditch & Hexes</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lord Voldemort -->
+                <div class="portrait-frame dark-lord" data-character="voldemort">
+                    <img src="images/voldemort.png" alt="Lord Voldemort" class="portrait-image" />
+                    <div class="portrait-overlay"></div>
+                    <div class="portrait-glow"></div>
+                    <div class="portrait-info">
+                        <div class="character-name">Lord Voldemort</div>
+                        <div class="character-role">The Dark Lord</div>
+                        <div class="character-house">💀 Dark Forces</div>
+                        <div class="character-details">
+                            <p><strong>Born:</strong> 31 December 1926</p>
+                            <p><strong>Patronus:</strong> None</p>
+                            <p><strong>Legacy:</strong> Pursuit of Immortality</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Character Details Modal -->
+            <div class="character-modal" id="characterModal">
+                <div class="modal-content">
+                    <span class="modal-close">&times;</span>
+                    <div class="modal-body">
+                        <div class="modal-emoji"></div>
+                        <h2 class="modal-name"></h2>
+                        <p class="modal-role"></p>
+                        <div class="modal-divider"></div>
+                        <div class="modal-description"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sorting Hat Section -->
+        <section id="sorting" class="reveal">
+            <div class="section-glow"></div>
+            <h1>The Sorting Ceremony</h1>
+            <div class="sorting-container">
+                <input type="text" class="sorting-input" id="nameInput" placeholder="Enter your name..." />
+                <button class="sort-button" id="sortButton">Begin Sorting Ceremony</button>
+                <div id="sortingResult"></div>
+            </div>
+        </section>
+
+        <!-- Great Hall Section -->
+        <section id="greatHall" class="reveal">
+            <div class="floating-candles" id="floatingCandles"></div>
+            <div class="hall-content">
+                <h1>The Great Hall</h1>
+                <div class="hall-text">
+                    Welcome to the majestic Great Hall of Hogwarts School of Witchcraft and Wizardry. This magnificent chamber serves as the heart of the castle, where all students gather for meals, important announcements, and cherished memories. With its enchanted ceiling reflecting the night sky, thousands of floating candles, and the long house tables, it is one of the most iconic locations in the wizarding world.
+                </div>
+            </div>
+        </section>
+
+        <!-- Patronus Section -->
+        <section id="patronus" class="reveal">
+            <div class="section-glow"></div>
+            <h1>Cast Your Patronus</h1>
+            <div class="patronus-container">
+                <p class="patronus-text">
+                    Summon your Patronus—a powerful guardian formed from your happiest memories that protects against dark forces. Focus on what brings you joy, and click below to cast the spell.
+                </p>
+                <button class="patronus-button" id="patronusButton">Expecto Patronum</button>
+            </div>
+        </section>
+
+        <!-- Timeline Section -->
+        <section id="timeline" class="reveal">
+            <div class="section-glow"></div>
+            <h1>The Complete Saga</h1>
+
+            <div class="timeline-wrapper">
+                <div class="timeline-line"></div>
+                <div class="timeline-items">
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-year">2001</div>
+                            <div class="timeline-title">Philosopher's Stone</div>
+                            <div class="timeline-description">The journey begins. Harry discovers his heritage at Hogwarts, making friends that will last a lifetime.</div>
+                        </div>
+                        <div class="timeline-dot"></div>
+                        <div></div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div></div>
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-year">2002</div>
+                            <div class="timeline-title">Chamber of Secrets</div>
+                            <div class="timeline-description">Ancient horrors awake within Hogwarts. Harry must face dark forces to save the students.</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-year">2004</div>
+                            <div class="timeline-title">Prisoner of Azkaban</div>
+                            <div class="timeline-description">Sirius Black escapes. Harry learns the truth about his parents and masters the Patronus Charm.</div>
+                        </div>
+                        <div class="timeline-dot"></div>
+                        <div></div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div></div>
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-year">2005</div>
+                            <div class="timeline-title">Goblet of Fire</div>
+                            <div class="timeline-description">The Triwizard Tournament brings glory and tragedy. The Dark Lord returns to power.</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-year">2007</div>
+                            <div class="timeline-title">Order of the Phoenix</div>
+                            <div class="timeline-description">A secret resistance forms. Harry leads Dumbledore's Army against rising darkness.</div>
+                        </div>
+                        <div class="timeline-dot"></div>
+                        <div></div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div></div>
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-year">2009</div>
+                            <div class="timeline-title">Half-Blood Prince</div>
+                            <div class="timeline-description">Dumbledore prepares Harry for the final struggle by exploring dark origins.</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-year">2010</div>
+                            <div class="timeline-title">Deathly Hallows: Part 1</div>
+                            <div class="timeline-description">The trio hunts for Horcruxes. The bond of friendship is tested as darkness closes in.</div>
+                        </div>
+                        <div class="timeline-dot"></div>
+                        <div></div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div></div>
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-year">2011</div>
+                            <div class="timeline-title">Deathly Hallows: Part 2</div>
+                            <div class="timeline-description">The epic conclusion. Harry and Voldemort meet for their final, fateful confrontation.</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Audio Toggle -->
+    <button class="audio-toggle" id="audioToggle">🔊</button>
+
+    <script>
+        // ==================== AUDIO SYSTEM ====================
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const audioToggle = document.getElementById('audioToggle');
+        let audioEnabled = true;
+
+        function playSound(frequency, duration, type = 'sine', volume = 0.1) {
+            if (!audioEnabled) return;
+            try {
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+                osc.frequency.value = frequency;
+                osc.type = type;
+                gain.gain.setValueAtTime(volume, audioContext.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+                osc.start(audioContext.currentTime);
+                osc.stop(audioContext.currentTime + duration);
+            } catch (e) {}
+        }
+
+        audioToggle.addEventListener('click', () => {
+            audioEnabled = !audioEnabled;
+            audioToggle.classList.toggle('muted');
+            audioToggle.textContent = audioEnabled ? '🔊' : '🔇';
+            playSound(800, 0.2);
+        });
+
+        // ==================== CURSOR EFFECTS ====================
+        const wandCursor = document.getElementById('wandCursor');
+        let mouseX = 0, mouseY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            wandCursor.style.left = mouseX - 10 + 'px';
+            wandCursor.style.top = mouseY - 10 + 'px';
+
+            if (Math.random() < 0.25) {
+                const trail = document.createElement('div');
+                trail.className = 'magic-trail';
+                trail.style.left = mouseX - 5 + 'px';
+                trail.style.top = mouseY - 5 + 'px';
+                trail.style.width = Math.random() * 8 + 4 + 'px';
+                trail.style.height = trail.style.width;
+                document.body.appendChild(trail);
+                setTimeout(() => trail.remove(), 800);
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            playSound(800, 0.1);
+            for (let i = 0; i < 15; i++) {
+                const spark = document.createElement('div');
+                spark.className = 'spark-burst';
+                spark.style.left = e.clientX + 'px';
+                spark.style.top = e.clientY + 'px';
+                const angle = (i / 15) * Math.PI * 2;
+                const distance = 100;
+                spark.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
+                spark.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
+                document.body.appendChild(spark);
+                setTimeout(() => spark.remove(), 1200);
+            }
+        });
+
+        // ==================== LANDING PAGE ====================
+        const loadingScreen = document.getElementById('loadingScreen');
+        const landingPage = document.getElementById('landingPage');
+        const enterButton = document.getElementById('enterButton');
+        const navBar = document.getElementById('navBar');
+        const particlesContainer = document.getElementById('particlesContainer');
+
+        function createParticles() {
+            for (let i = 0; i < 60; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animation = `fadeTrail ${2 + Math.random() * 4}s ease-out forwards`;
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        createParticles();
+        setInterval(createParticles, 4000);
+
+        setTimeout(() => {
+            loadingScreen.classList.add('hidden');
+        }, 3500);
+
+        enterButton.addEventListener('click', () => {
+            playSound(523.25, 0.6);
+            playSound(659.25, 0.4);
+            landingPage.classList.add('fade-out');
+            setTimeout(() => {
+                landingPage.style.display = 'none';
+                navBar.style.display = 'flex';
+                document.body.style.overflow = 'auto';
+                initializeScrollAnimations();
+            }, 800);
+        });
+
+        // ==================== NAVIGATION ====================
+        const navItems = document.querySelectorAll('.nav-item');
+
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const section = item.dataset.section;
+                const element = document.getElementById(section);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                    updateActiveNav(section);
+                    playSound(440, 0.3);
+                }
+            });
+        });
+
+        function updateActiveNav(sectionId) {
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.section === sectionId) {
+                    item.classList.add('active');
+                }
+            });
+        }
+
+        // ==================== SCROLL ANIMATIONS ====================
+        function initializeScrollAnimations() {
+            const reveals = document.querySelectorAll('.reveal');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        playSound(523.25 + Math.random() * 200, 0.25, 'sine', 0.08);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            reveals.forEach(el => observer.observe(el));
+        }
+
+        // ==================== SPELL CARDS INTERACTION ====================
+        const spellCards = document.querySelectorAll('.spell-card');
+
+        spellCards.forEach(card => {
+            card.addEventListener('click', function() {
+                playSound(880, 0.5);
+                createSpellEffect(this);
+            });
+
+            card.addEventListener('mouseenter', function() {
+                createSpellParticles(this);
+                playSound(600 + Math.random() * 200, 0.2);
+            });
+        });
+
+        function createSpellParticles(card) {
+            const rect = card.getBoundingClientRect();
+            for (let i = 0; i < 12; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'spark-burst';
+                particle.style.left = rect.left + Math.random() * rect.width + 'px';
+                particle.style.top = rect.top + Math.random() * rect.height + 'px';
+                const angle = (i / 12) * Math.PI * 2;
+                const distance = 80;
+                particle.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
+                particle.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
+                document.body.appendChild(particle);
+                setTimeout(() => particle.remove(), 800);
+            }
+        }
+
+        function createSpellEffect(card) {
+            const rect = card.getBoundingClientRect();
+            for (let i = 0; i < 25; i++) {
+                setTimeout(() => {
+                    const spark = document.createElement('div');
+                    spark.style.position = 'fixed';
+                    spark.style.width = '6px';
+                    spark.style.height = '6px';
+                    spark.style.background = 'var(--gold)';
+                    spark.style.borderRadius = '50%';
+                    spark.style.left = rect.left + Math.random() * rect.width + 'px';
+                    spark.style.top = rect.top + Math.random() * rect.height + 'px';
+                    spark.style.pointerEvents = 'none';
+                    spark.style.boxShadow = '0 0 10px var(--gold)';
+                    spark.style.zIndex = '1500';
+                    document.body.appendChild(spark);
+
+                    const duration = 1.2;
+                    const startX = parseFloat(spark.style.left);
+                    const startY = parseFloat(spark.style.top);
+                    const endX = startX + (Math.random() - 0.5) * 300;
+                    const endY = startY - Math.random() * 250;
+
+                    let elapsed = 0;
+                    const animate = () => {
+                        elapsed += 0.05;
+                        const progress = Math.min(elapsed / duration, 1);
+                        spark.style.left = startX + (endX - startX) * progress + 'px';
+                        spark.style.top = startY + (endY - startY) * progress + 'px';
+                        spark.style.opacity = 1 - progress;
+                        if (progress < 1) requestAnimationFrame(animate);
+                        else spark.remove();
+                    };
+                    animate();
+                }, i * 25);
+            }
+        }
+
+        // ==================== CHARACTER MODAL ====================
+        const characterData = {
+            harry: {
+                
+                name: 'Harry James Potter',
+                role: 'The Chosen One',
+                description: 'Born to James and Lily Potter, Harry survived Voldemort\'s killing curse as a baby, making him the most famous wizard of his age. With his signature lightning bolt scar and green eyes, he became a symbol of hope and resistance. Harry\'s unwavering courage, loyalty to his friends, and willingness to sacrifice himself defined his heroic journey.'
+            },
+            hermione: {
+                
+                name: 'Hermione Jean Granger',
+                role: 'Brightest Witch of Her Age',
+                description: 'Born to Muggle parents, Hermione\'s extraordinary intellect and work ethic made her one of the most brilliant witches of her generation. Her strategic mind, vast magical knowledge, and unwavering moral compass were instrumental in the fight against Voldemort. She became a beacon of intelligence and justice in the wizarding world.'
+            },
+            ron: {
+               
+                name: 'Ronald Bilius Weasley',
+                role: 'Loyal Friend & Strategist',
+                description: 'From a large and loving wizarding family, Ron grew from an insecure boy to a trusted strategist and loyal companion. His chess mastery, quick thinking under pressure, and genuine heart made him invaluable to Harry and Hermione. Ron\'s journey of self-discovery proved that heroism isn\'t always about being the most talented.'
+            },
+            dumbledore: {
+               
+                name: 'Albus Percival Wulfric Brian Dumbledore',
+                role: 'Headmaster & Mentor',
+                description: 'Widely considered the greatest wizard of all time, Dumbledore\'s wisdom, magical power, and strategic foresight guided the wizarding world through its darkest hours. His deep understanding of love\'s power and ability to see potential in others shaped his role as mentor and leader. His greatest magic was understanding the human heart.'
+            },
+            snape: {
+               
+                name: 'Severus Tobias Snape',
+                role: 'Master of Potions',
+                description: 'A complex and misunderstood figure, Snape\'s mastery of Potions was unparalleled. His secret love, his double life as a spy, and his ultimate sacrifice revealed a depth of character that transcended his cold exterior. Snape\'s story is one of redemption and the power of love to change us.'
+            },
+            luna: {
+              
+                name: 'Luna Lovegood',
+                role: 'The Dreamer & Visionary',
+                description: 'Eccentric and wonderfully unique, Luna\'s ability to see beyond the veil made her invaluable in the fight against Voldemort. Her fearless individuality and genuine kindness made her beloved despite others\'s mockery. Luna proved that being different is a strength, not a weakness.'
+            },
+            draco: {
+              
+                name: 'Draco Lucius Malfoy',
+                role: 'Rival & Adversary',
+                description: 'Born into a dark legacy, Draco\'s journey from arrogant bully to conflicted young man showed his capacity for growth. Though he opposed Harry, his hesitation at crucial moments revealed his inner conflict between family duty and personal morality. Draco\'s redemption arc proved no one is beyond saving.'
+            },
+            hagrid: {
+           
+                name: 'Rubeus Ignatius Hagrid',
+                role: 'Gamekeeper & Guardian',
+                description: 'A half-giant with a heart as vast as his physical form, Hagrid\'s love for magical creatures and unwavering loyalty to Dumbledore made him a pillar of Hogwarts. His gentle nature, despite his formidable power, and his role in protecting dangerous beasts showed his unique strength. Hagrid\'s journey proved strength lies not in power, but in compassion.'
+            },
+            ginny: {
+               
+                name: 'Ginevra Molly Weasley',
+                role: 'Seeker & Warrior',
+                description: 'The only Weasley daughter, Ginny overcame possession by a memory of Voldemort to become a fierce Quidditch player and skilled duelist. Her bravery in battle, quick wit, and steady presence made her more than just Ron\'s sister. Ginny\'s strength and independence inspired all those around her.'
+            },
+            voldemort: {
+                
+                name: 'Tom Marvolo Riddle / Lord Voldemort',
+                role: 'The Dark Lord',
+                description: 'Born as Tom Riddle, a brilliant but deeply disturbed orphan, Voldemort became the most feared dark wizard of all time. His obsession with power and immortality led him to create Horcruxes and wage war on the wizarding world. His ultimate defeat by Harry proved that no dark magic could overcome the bonds of friendship and love.'
+            }
+        };
+
+        const characterModal = document.getElementById('characterModal');
+        const modalClose = document.querySelector('.modal-close');
+        const portraitFrames = document.querySelectorAll('.portrait-frame');
+
+        portraitFrames.forEach(frame => {
+            frame.addEventListener('click', () => {
+                const character = frame.dataset.character;
+                const data = characterData[character];
+                
+                if (data) {
+                    document.querySelector('.modal-emoji').textContent = data.emoji;
+                    document.querySelector('.modal-name').textContent = data.name;
+                    document.querySelector('.modal-role').textContent = data.role;
+                    document.querySelector('.modal-description').innerHTML = `<p>${data.description}</p>`;
+                    
+                    characterModal.classList.add('active');
+                    playSound(659.25, 0.3);
+                    
+                    const rect = frame.getBoundingClientRect();
+                    for (let i = 0; i < 20; i++) {
+                        const spark = document.createElement('div');
+                        spark.className = 'spark-burst';
+                        spark.style.left = rect.left + Math.random() * rect.width + 'px';
+                        spark.style.top = rect.top + Math.random() * rect.height + 'px';
+                        const angle = (i / 20) * Math.PI * 2;
+                        const distance = 100;
+                        spark.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
+                        spark.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
+                        document.body.appendChild(spark);
+                        setTimeout(() => spark.remove(), 1200);
+                    }
+                }
+            });
+
+            frame.addEventListener('mouseenter', () => {
+                playSound(523.25 + Math.random() * 100, 0.15);
+            });
+        });
+
+        modalClose.addEventListener('click', () => {
+            characterModal.classList.remove('active');
+            playSound(400, 0.2);
+        });
+
+        characterModal.addEventListener('click', (e) => {
+            if (e.target === characterModal) {
+                characterModal.classList.remove('active');
+                playSound(400, 0.2);
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && characterModal.classList.contains('active')) {
+                characterModal.classList.remove('active');
+                playSound(400, 0.2);
+            }
+        });
+
+        // ==================== SORTING HAT ====================
+        const nameInput = document.getElementById('nameInput');
+        const sortButton = document.getElementById('sortButton');
+        const sortingResult = document.getElementById('sortingResult');
+        const houses = ['Gryffindor', 'Slytherin', 'Ravenclaw', 'Hufflepuff'];
+        const houseColors = ['#DC143C', '#2D5A3D', '#0E1A40', '#F1C40F'];
+
+        sortButton.addEventListener('click', () => {
+            const name = nameInput.value.trim();
+            if (!name) return;
+
+            playSound(440, 0.5);
+
+            sortingResult.innerHTML = '<div class="sorting-hat" style="opacity: 0;">🎩</div>';
+            const hat = sortingResult.querySelector('.sorting-hat');
+            setTimeout(() => {
+                hat.classList.add('hat-appearing');
+            }, 50);
+
+            setTimeout(() => {
+                hat.classList.add('hat-shaking');
+                for (let i = 0; i < 8; i++) {
+                    setTimeout(() => {
+                        playSound(300 + Math.random() * 200, 0.15);
+                    }, i * 150);
+                }
+            }, 900);
+
+            setTimeout(() => {
+                const houseIndex = Math.floor(Math.random() * houses.length);
+                const house = houses[houseIndex];
+                const color = houseColors[houseIndex];
+
+                playSound(523.25, 0.3);
+                playSound(659.25, 0.3);
+                playSound(783.99, 0.4);
+
+                sortingResult.innerHTML = `<div class="house-reveal" style="color: ${color}">✨ Welcome to ${house}, ${name}! ✨</div>`;
+            }, 2000);
+        });
+
+        nameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sortButton.click();
+        });
+
+        // ==================== EASTER EGG ====================
+        let keyBuffer = '';
+        document.addEventListener('keydown', (e) => {
+            keyBuffer += e.key.toLowerCase();
+            keyBuffer = keyBuffer.slice(-12);
+            if (keyBuffer.includes('alohomora')) {
+                playSound(784, 0.4);
+                playSound(880, 0.4);
+                const banner = document.createElement('div');
+                banner.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: linear-gradient(135deg, var(--gold), #FFE8A8); padding: 40px 60px; border-radius: 15px; font-family: Cinzel, serif; font-size: 2rem; color: var(--darker-bg); z-index: 9999; box-shadow: 0 0 80px var(--gold); text-align: center;';
+                banner.textContent = '🔓 ALOHOMORA! SECRETS UNLOCKED! ✨';
+                document.body.appendChild(banner);
+                setTimeout(() => banner.remove(), 3000);
+                keyBuffer = '';
+            }
+        });
+
+        // ==================== FLOATING CANDLES ====================
+        function createFloatingCandles() {
+            const container = document.getElementById('floatingCandles');
+            for (let i = 0; i < 20; i++) {
+                const candle = document.createElement('div');
+                candle.className = 'candle';
+                candle.style.left = Math.random() * 100 + '%';
+                candle.style.top = Math.random() * 50 + '%';
+                candle.style.animationDelay = Math.random() * 3 + 's';
+                candle.style.animationDuration = (5 + Math.random() * 3) + 's';
+                container.appendChild(candle);
+            }
+        }
+
+        window.addEventListener('scroll', () => {
+            const greatHall = document.getElementById('greatHall');
+            if (greatHall && !greatHall.dataset.initialized) {
+                const rect = greatHall.getBoundingClientRect();
+                if (rect.top < window.innerHeight) {
+                    createFloatingCandles();
+                    greatHall.dataset.initialized = 'true';
+                }
+            }
+        }, { once: false });
+
+        // ==================== PATRONUS ====================
+        const patronusButton = document.getElementById('patronusButton');
+
+        patronusButton.addEventListener('click', () => {
+            playSound(783.99, 0.5);
+            playSound(987.77, 0.5);
+
+            const patronus = document.createElement('div');
+            patronus.className = 'patronus';
+            patronus.textContent = '🦌';
+            patronus.style.left = mouseX + 'px';
+            patronus.style.top = mouseY + 'px';
+            document.body.appendChild(patronus);
+
+            let x = mouseX;
+            let y = mouseY;
+            const trail = setInterval(() => {
+                x += (Math.random() - 0.5) * 30;
+                y += (Math.random() - 0.5) * 30;
+
+                const particle = document.createElement('div');
+                particle.className = 'patronus-trail';
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                document.body.appendChild(particle);
+                setTimeout(() => particle.remove(), 1200);
+            }, 40);
+
+            setTimeout(() => clearInterval(trail), 4000);
+            setTimeout(() => patronus.remove(), 4000);
+        });
+
+        // ==================== TIMELINE REVEAL ====================
+        window.addEventListener('scroll', () => {
+            const timelineItems = document.querySelectorAll('.timeline-item');
+            timelineItems.forEach((item, index) => {
+                const rect = item.getBoundingClientRect();
+                if (rect.top < window.innerHeight * 0.8 && item.style.opacity !== '1') {
+                    setTimeout(() => {
+                        item.style.opacity = '1';
+                        item.style.animation = `fadeInText 0.8s ease-out ${index * 0.15}s forwards`;
+                    }, 50);
+                }
+            });
+        });
+
+        const timelineItems = document.querySelectorAll('.timeline-item');
+        timelineItems.forEach((item) => {
+            item.style.opacity = '0';
+        });
+    </script>
+</body>
+</html>
