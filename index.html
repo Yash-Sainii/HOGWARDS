@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#050810">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>The Wizarding World - Immersive Experience</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital@0;1&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
     <style>
@@ -10,28 +13,8 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-
-             
-            .house-emblem {
-                width: 70px;
-                height: 70px;
-                margin: 0 auto 15px auto;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                overflow: hidden;
-            }
-
-            .house-emblem img{
-                width: 100%;
-                height: 100%;
-                object-fit: contain;
-            }
-            .house-card img{
-                max-width:70px !important;
-                max-height:70px !important;
-                object-fit:contain;
-            }
+            -webkit-font-smoothing: antialiased;
+            -webkit-tap-highlight-color: transparent;
         }
 
         :root {
@@ -53,6 +36,7 @@
             color: var(--silver);
             font-family: 'Crimson Text', serif;
             scroll-behavior: smooth;
+            overflow-x: hidden;
         }
 
         body {
@@ -64,6 +48,17 @@
             cursor: none;
         }
 
+        @media (hover: none) and (pointer: coarse) {
+            body {
+                cursor: auto;
+            }
+            .wand-cursor,
+            .magic-trail,
+            .spark-burst {
+                display: none;
+            }
+        }
+
         .wand-cursor {
             position: fixed;
             pointer-events: none;
@@ -71,6 +66,13 @@
             width: 20px;
             height: 20px;
             mix-blend-mode: screen;
+            display: none;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .wand-cursor {
+                display: block;
+            }
         }
 
         .wand-cursor::before {
@@ -186,7 +188,7 @@
 
         .loading-text {
             font-family: 'Cinzel', serif;
-            font-size: 2.5rem;
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
             color: var(--gold);
             text-align: center;
             letter-spacing: 4px;
@@ -268,7 +270,7 @@
             bottom: 200px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 8rem;
+            font-size: clamp(4rem, 15vw, 8rem);
             opacity: 0;
             animation: castleRise 4s ease-out 1.5s forwards;
             text-shadow: 0 0 50px var(--gold), 0 0 100px rgba(212, 175, 55, 0.5);
@@ -309,21 +311,22 @@
             flex-direction: column;
             align-items: center;
             justify-content: flex-end;
-            padding-bottom: 150px;
+            padding-bottom: clamp(80px, 15vh, 150px);
             z-index: 10;
         }
 
         .landing-title {
             font-family: 'Playfair Display', serif;
-            font-size: 4.5rem;
+            font-size: clamp(2rem, 8vw, 4.5rem);
             font-weight: 900;
             color: var(--gold);
             text-align: center;
-            letter-spacing: 8px;
+            letter-spacing: clamp(2px, 2vw, 8px);
             opacity: 0;
             animation: titleAppear 2s ease-out 2s forwards;
             text-shadow: 0 0 50px var(--gold), 0 0 100px rgba(212, 175, 55, 0.6);
-            margin-bottom: 60px;
+            margin-bottom: clamp(30px, 8vh, 60px);
+            padding: 0 20px;
         }
 
         @keyframes titleAppear {
@@ -339,9 +342,9 @@
 
         .enter-button {
             position: relative;
-            padding: 18px 60px;
+            padding: clamp(12px, 4vw, 18px) clamp(35px, 8vw, 60px);
             font-family: 'Cinzel', serif;
-            font-size: 1.3rem;
+            font-size: clamp(0.9rem, 2.5vw, 1.3rem);
             color: var(--darker-bg);
             background: var(--gold);
             border: 3px solid var(--gold);
@@ -354,6 +357,7 @@
             box-shadow: 0 0 40px var(--gold), inset 0 0 20px rgba(255, 255, 255, 0.3);
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
             overflow: hidden;
+            touch-action: manipulation;
         }
 
         @keyframes buttonAppear {
@@ -377,33 +381,39 @@
             transform: scale(0.95);
         }
 
+        @media (max-width: 768px) {
+            .enter-button:active {
+                transform: scale(0.98);
+            }
+        }
+
         /* ==================== NAVIGATION BAR ==================== */
         .nav-bar {
             position: fixed;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(217, 179, 102, 0.95);
-            padding: 20px 40px;
-            border-radius: 15px;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(217, 179, 102, 0.98);
+            padding: max(10px, env(safe-area-inset-bottom));
             display: flex;
-            gap: 35px;
+            gap: clamp(10px, 3vw, 35px);
             z-index: 2000;
-            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(139, 117, 0, 0.3);
-            border: 2px solid var(--deep-gold);
+            box-shadow: 0 -10px 50px rgba(0, 0, 0, 0.8);
+            border-top: 2px solid var(--deep-gold);
+            justify-content: center;
+            flex-wrap: wrap;
             opacity: 0;
             animation: mapAppear 1s ease-out 3.5s forwards;
-            backdrop-filter: blur(10px);
         }
 
         @keyframes mapAppear {
             from {
                 opacity: 0;
-                transform: translateX(-50%) translateY(30px);
+                transform: translateY(30px);
             }
             to {
                 opacity: 1;
-                transform: translateX(-50%) translateY(0);
+                transform: translateY(0);
             }
         }
 
@@ -413,16 +423,23 @@
             color: var(--darker-bg);
             font-family: 'Cinzel', serif;
             font-weight: 600;
-            padding: 8px 16px;
+            padding: clamp(6px, 2vw, 8px) clamp(10px, 3vw, 16px);
             border-radius: 8px;
             transition: all 0.3s ease;
-            font-size: 0.95rem;
-            letter-spacing: 2px;
+            font-size: clamp(0.7rem, 2vw, 0.95rem);
+            letter-spacing: 1px;
+            white-space: nowrap;
         }
 
         .nav-item:hover {
             background: rgba(212, 175, 55, 0.6);
-            transform: scale(1.15);
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+            .nav-item:hover {
+                transform: scale(1.05);
+            }
         }
 
         .nav-item.active {
@@ -434,11 +451,12 @@
         .main-content {
             position: relative;
             width: 100%;
+            padding-bottom: 80px;
         }
 
         section {
             min-height: 100vh;
-            padding: 120px 50px;
+            padding: clamp(60px, 10vh, 120px) clamp(20px, 5vw, 50px);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -461,12 +479,12 @@
 
         h1 {
             font-family: 'Playfair Display', serif;
-            font-size: 4rem;
+            font-size: clamp(2rem, 7vw, 4rem);
             font-weight: 900;
             color: var(--gold);
-            margin-bottom: 60px;
+            margin-bottom: clamp(30px, 8vh, 60px);
             text-align: center;
-            letter-spacing: 4px;
+            letter-spacing: clamp(2px, 1vw, 4px);
             text-shadow: 0 0 40px var(--gold);
             position: relative;
             z-index: 5;
@@ -474,12 +492,20 @@
 
         h1::before {
             content: '✦ ';
-            margin-right: 20px;
+            margin-right: 10px;
         }
 
         h1::after {
             content: ' ✦';
-            margin-left: 20px;
+            margin-left: 10px;
+        }
+
+        @media (max-width: 480px) {
+            h1::before,
+            h1::after {
+                content: '';
+                margin: 0;
+            }
         }
 
         .section-glow {
@@ -495,18 +521,30 @@
         /* ==================== HOUSES SECTION ==================== */
         .houses-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 40px;
+            grid-template-columns: 1fr;
+            gap: clamp(20px, 5vw, 40px);
             width: 100%;
             max-width: 1300px;
             position: relative;
             z-index: 5;
         }
 
+        @media (min-width: 769px) {
+            .houses-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .houses-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
         .house-card {
             background: rgba(30, 30, 50, 0.9);
             border: 3px solid;
-            padding: 50px;
+            padding: clamp(30px, 5vw, 50px);
             border-radius: 15px;
             cursor: pointer;
             transition: all 0.4s ease;
@@ -517,6 +555,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            touch-action: manipulation;
         }
 
         .house-card::before {
@@ -551,6 +590,13 @@
             border-color: var(--house-color);
         }
 
+        @media (max-width: 768px) {
+            .house-card:active {
+                transform: translateY(-8px);
+                box-shadow: 0 15px 30px var(--house-color);
+            }
+        }
+
         .house-card:hover::before {
             opacity: 0.15;
         }
@@ -571,13 +617,30 @@
         }
 
         .house-emblem {
-            font-size: 4rem;
-            margin-bottom: 15px;
+            width: clamp(50px, 10vw, 70px);
+            height: clamp(50px, 10vw, 70px);
+            margin: 0 auto 15px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .house-emblem img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .house-card img {
+            max-width: clamp(50px, 10vw, 70px) !important;
+            max-height: clamp(50px, 10vw, 70px) !important;
+            object-fit: contain;
         }
 
         .house-name {
             font-family: 'Cinzel', serif;
-            font-size: 2.2rem;
+            font-size: clamp(1.5rem, 4vw, 2.2rem);
             margin-bottom: 10px;
             color: var(--house-color);
             text-shadow: 0 0 25px var(--house-color);
@@ -586,7 +649,7 @@
         .house-motto {
             font-style: italic;
             color: var(--wizard-blue);
-            font-size: 0.95rem;
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
             margin-bottom: 20px;
         }
 
@@ -595,7 +658,7 @@
             line-height: 1.9;
             position: relative;
             z-index: 5;
-            font-size: 0.95rem;
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
         }
 
         .house-info p {
@@ -609,18 +672,30 @@
         /* ==================== SPELLS SECTION ==================== */
         .spell-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
+            grid-template-columns: 1fr;
+            gap: clamp(20px, 4vw, 30px);
             width: 100%;
             max-width: 1300px;
             position: relative;
             z-index: 5;
         }
 
+        @media (min-width: 769px) {
+            .spell-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1100px) {
+            .spell-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
         .spell-card {
             background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(26, 58, 82, 0.25));
             border: 2px solid var(--gold);
-            padding: 35px;
+            padding: clamp(25px, 4vw, 35px);
             border-radius: 12px;
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -631,6 +706,7 @@
             flex-direction: column;
             justify-content: space-between;
             backdrop-filter: blur(10px);
+            touch-action: manipulation;
         }
 
         .spell-card::before {
@@ -651,13 +727,20 @@
             border-color: var(--silver);
         }
 
+        @media (max-width: 768px) {
+            .spell-card:active {
+                transform: scale(1.02);
+                box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
+            }
+        }
+
         .spell-card:hover::before {
             opacity: 0.2;
         }
 
         .spell-name {
             font-family: 'Cinzel', serif;
-            font-size: 1.6rem;
+            font-size: clamp(1.3rem, 3vw, 1.6rem);
             color: var(--gold);
             margin-bottom: 10px;
             position: relative;
@@ -667,7 +750,7 @@
 
         .spell-effect {
             color: var(--light-gold);
-            font-size: 0.9rem;
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
             font-style: italic;
             margin-bottom: 15px;
             position: relative;
@@ -676,7 +759,7 @@
 
         .spell-description {
             color: var(--silver);
-            font-size: 0.9rem;
+            font-size: clamp(0.8rem, 1.8vw, 0.9rem);
             line-height: 1.7;
             position: relative;
             z-index: 5;
@@ -685,17 +768,24 @@
         /* ==================== CHARACTERS SECTION ==================== */
         .gallery {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: clamp(15px, 3vw, 30px);
             width: 100%;
             max-width: 1500px;
             position: relative;
             z-index: 5;
         }
 
+        @media (max-width: 480px) {
+            .gallery {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+        }
+
         .portrait-frame {
             aspect-ratio: 3 / 4;
-            border: 6px solid var(--gold);
+            border: 4px solid var(--gold);
             border-radius: 12px;
             overflow: hidden;
             cursor: pointer;
@@ -704,11 +794,18 @@
             box-shadow: 0 0 30px var(--gold), inset 0 0 25px rgba(0, 0, 0, 0.5);
             transition: all 0.4s ease;
             perspective: 1000px;
+            touch-action: manipulation;
         }
 
         .portrait-frame:hover {
             transform: scale(1.08) rotateY(5deg) translateZ(20px);
             box-shadow: 0 0 60px var(--gold), inset 0 0 40px rgba(212, 175, 55, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .portrait-frame:active {
+                transform: scale(1.03);
+            }
         }
 
         .portrait-frame img {
@@ -781,13 +878,13 @@
             font-family: 'Cinzel', serif;
             color: var(--gold);
             margin-bottom: 5px;
-            font-size: 1.4rem;
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
             text-shadow: 0 0 15px var(--gold);
             letter-spacing: 2px;
         }
 
         .character-role {
-            font-size: 0.9rem;
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
             color: var(--light-gold);
             font-style: italic;
             margin-bottom: 10px;
@@ -795,7 +892,7 @@
 
         .character-house {
             font-family: 'Cinzel', serif;
-            font-size: 0.85rem;
+            font-size: clamp(0.75rem, 1.5vw, 0.85rem);
             color: var(--wizard-blue);
             margin-bottom: 15px;
             letter-spacing: 1px;
@@ -804,7 +901,7 @@
 
         .character-details {
             display: none;
-            font-size: 0.8rem;
+            font-size: clamp(0.7rem, 1.5vw, 0.8rem);
             line-height: 1.6;
             max-height: 200px;
             overflow-y: auto;
@@ -838,6 +935,7 @@
             z-index: 9999;
             opacity: 0;
             transition: opacity 0.4s ease;
+            padding: 20px;
         }
 
         .character-modal.active {
@@ -849,13 +947,15 @@
             background: linear-gradient(135deg, rgba(30, 30, 50, 0.95), rgba(26, 58, 82, 0.8));
             border: 3px solid var(--gold);
             border-radius: 20px;
-            padding: 60px 50px;
+            padding: clamp(40px, 8vw, 60px) clamp(30px, 6vw, 50px);
             max-width: 500px;
-            width: 90%;
+            width: 100%;
             position: relative;
             box-shadow: 0 0 60px var(--gold), inset 0 0 40px rgba(212, 175, 55, 0.1);
             animation: modalAppear 0.5s ease-out;
             backdrop-filter: blur(10px);
+            max-height: 85vh;
+            overflow-y: auto;
         }
 
         @keyframes modalAppear {
@@ -873,10 +973,11 @@
             position: absolute;
             top: 20px;
             right: 25px;
-            font-size: 3rem;
+            font-size: clamp(2rem, 5vw, 3rem);
             cursor: pointer;
             color: var(--gold);
             transition: all 0.3s ease;
+            touch-action: manipulation;
         }
 
         .modal-close:hover {
@@ -889,7 +990,7 @@
         }
 
         .modal-emoji {
-            font-size: 8rem;
+            font-size: clamp(4rem, 10vw, 8rem);
             margin-bottom: 20px;
             animation: emojiFloat 2s ease-in-out infinite;
         }
@@ -901,7 +1002,7 @@
 
         .modal-name {
             font-family: 'Playfair Display', serif;
-            font-size: 2.8rem;
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
             color: var(--gold);
             margin-bottom: 10px;
             text-shadow: 0 0 20px var(--gold);
@@ -910,7 +1011,7 @@
 
         .modal-role {
             font-family: 'Cinzel', serif;
-            font-size: 1.1rem;
+            font-size: clamp(0.95rem, 2.5vw, 1.1rem);
             color: var(--light-gold);
             margin-bottom: 20px;
             font-style: italic;
@@ -924,7 +1025,7 @@
         }
 
         .modal-description {
-            font-size: 1rem;
+            font-size: clamp(0.85rem, 2vw, 1rem);
             line-height: 1.8;
             color: var(--silver);
             text-align: left;
@@ -934,7 +1035,6 @@
             margin-bottom: 15px;
         }
 
-        /* Dark Lord Voldemort Special Styling */
         .portrait-frame.dark-lord {
             border-color: #8B0000;
             box-shadow: 0 0 30px #8B0000, inset 0 0 25px rgba(139, 0, 0, 0.3);
@@ -950,16 +1050,17 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 50px;
+            gap: clamp(30px, 6vw, 50px);
             position: relative;
             z-index: 5;
             max-width: 600px;
+            width: 100%;
         }
 
         .sorting-input {
             font-family: 'Crimson Text', serif;
-            font-size: 1.3rem;
-            padding: 18px 35px;
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            padding: clamp(12px, 3vw, 18px) clamp(25px, 5vw, 35px);
             border: 3px solid var(--gold);
             background: rgba(0, 0, 0, 0.8);
             color: var(--gold);
@@ -968,6 +1069,7 @@
             width: 100%;
             transition: all 0.3s ease;
             box-shadow: 0 0 20px var(--wizard-blue);
+            touch-action: manipulation;
         }
 
         .sorting-input:focus {
@@ -983,9 +1085,9 @@
         }
 
         .sort-button {
-            padding: 18px 50px;
+            padding: clamp(12px, 3vw, 18px) clamp(35px, 8vw, 50px);
             font-family: 'Cinzel', serif;
-            font-size: 1.2rem;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
             color: var(--darker-bg);
             background: var(--gold);
             border: none;
@@ -995,6 +1097,7 @@
             box-shadow: 0 0 30px var(--gold);
             letter-spacing: 3px;
             font-weight: 700;
+            touch-action: manipulation;
         }
 
         .sort-button:hover {
@@ -1002,8 +1105,14 @@
             box-shadow: 0 0 50px var(--gold);
         }
 
+        @media (max-width: 768px) {
+            .sort-button:active {
+                transform: scale(0.98);
+            }
+        }
+
         .sorting-hat {
-            font-size: 7rem;
+            font-size: clamp(4rem, 10vw, 7rem);
             opacity: 0;
             transform: translateY(100px) rotateZ(-15deg);
             filter: drop-shadow(0 0 40px var(--gold));
@@ -1037,7 +1146,7 @@
 
         .house-reveal {
             font-family: 'Playfair Display', serif;
-            font-size: 3rem;
+            font-size: clamp(2rem, 6vw, 3rem);
             letter-spacing: 4px;
             opacity: 0;
             animation: houseReveal 1s ease-out 1.8s forwards;
@@ -1089,11 +1198,11 @@
         }
 
         .hall-text {
-            font-size: 1.3rem;
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
             color: var(--silver);
             line-height: 2;
             max-width: 900px;
-            margin: 50px auto;
+            margin: clamp(30px, 5vh, 50px) auto;
         }
 
         /* ==================== PATRONUS SECTION ==================== */
@@ -1101,14 +1210,14 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 40px;
+            gap: clamp(30px, 6vw, 40px);
             position: relative;
             z-index: 5;
         }
 
         .patronus-text {
             color: var(--silver);
-            font-size: 1.2rem;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
             margin-bottom: 20px;
             max-width: 700px;
             line-height: 1.8;
@@ -1116,9 +1225,9 @@
         }
 
         .patronus-button {
-            padding: 22px 60px;
+            padding: clamp(15px, 3vw, 22px) clamp(40px, 8vw, 60px);
             font-family: 'Cinzel', serif;
-            font-size: 1.4rem;
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
             color: var(--darker-bg);
             background: linear-gradient(135deg, var(--gold), #FFE8A8);
             border: none;
@@ -1130,6 +1239,7 @@
             font-weight: 700;
             position: relative;
             overflow: hidden;
+            touch-action: manipulation;
         }
 
         .patronus-button:hover {
@@ -1137,9 +1247,15 @@
             box-shadow: 0 0 80px var(--gold);
         }
 
+        @media (max-width: 768px) {
+            .patronus-button:active {
+                transform: scale(0.98);
+            }
+        }
+
         .patronus {
             position: fixed;
-            font-size: 5rem;
+            font-size: clamp(3rem, 8vw, 5rem);
             opacity: 0;
             filter: drop-shadow(0 0 30px var(--silver)) brightness(1.4);
             animation: patronusRun 4s ease-out forwards;
@@ -1186,52 +1302,72 @@
             max-width: 1000px;
             position: relative;
             z-index: 5;
+            width: 100%;
         }
 
         .timeline-line {
             position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
+            left: 25px;
             width: 4px;
             height: 100%;
             background: linear-gradient(180deg, var(--gold), transparent);
             z-index: 1;
         }
 
+        @media (min-width: 769px) {
+            .timeline-line {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+
         .timeline-items {
             display: flex;
             flex-direction: column;
-            gap: 80px;
+            gap: clamp(50px, 8vh, 80px);
             position: relative;
             z-index: 2;
         }
 
         .timeline-item {
             display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            gap: 50px;
+            grid-template-columns: 50px 1fr;
+            gap: clamp(20px, 3vw, 50px);
             align-items: center;
             opacity: 0;
         }
 
-        .timeline-item:nth-child(odd) .timeline-content {
-            grid-column: 1;
-            text-align: right;
-        }
+        @media (min-width: 769px) {
+            .timeline-item {
+                grid-template-columns: 1fr auto 1fr;
+            }
 
-        .timeline-item:nth-child(even) .timeline-content {
-            grid-column: 3;
-            text-align: left;
+            .timeline-item:nth-child(odd) .timeline-content {
+                grid-column: 1;
+                text-align: right;
+            }
+
+            .timeline-item:nth-child(even) .timeline-content {
+                grid-column: 3;
+                text-align: left;
+            }
         }
 
         .timeline-content {
             background: rgba(30, 30, 50, 0.9);
-            padding: 35px;
+            padding: clamp(25px, 4vw, 35px);
             border: 2px solid var(--gold);
             border-radius: 12px;
             cursor: pointer;
             transition: all 0.4s ease;
             backdrop-filter: blur(10px);
+            grid-column: 2;
+        }
+
+        @media (min-width: 769px) {
+            .timeline-content {
+                grid-column: unset;
+            }
         }
 
         .timeline-content:hover {
@@ -1241,7 +1377,7 @@
 
         .timeline-year {
             font-family: 'Cinzel', serif;
-            font-size: 2rem;
+            font-size: clamp(1.5rem, 3vw, 2rem);
             color: var(--gold);
             margin-bottom: 10px;
             text-shadow: 0 0 15px var(--gold);
@@ -1249,14 +1385,14 @@
 
         .timeline-title {
             font-family: 'Cinzel', serif;
-            font-size: 1.3rem;
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
             color: var(--silver);
             margin-bottom: 15px;
         }
 
         .timeline-description {
             color: var(--wizard-blue);
-            font-size: 0.95rem;
+            font-size: clamp(0.85rem, 1.8vw, 0.95rem);
             line-height: 1.7;
         }
 
@@ -1269,15 +1405,23 @@
             box-shadow: 0 0 25px var(--gold);
             position: relative;
             z-index: 10;
+            grid-column: 1;
+            justify-self: center;
+        }
+
+        @media (min-width: 769px) {
+            .timeline-dot {
+                grid-column: 2;
+            }
         }
 
         /* ==================== AUDIO TOGGLE ==================== */
         .audio-toggle {
             position: fixed;
-            bottom: 40px;
-            right: 40px;
-            width: 70px;
-            height: 70px;
+            bottom: clamp(20px, 3vh, 40px);
+            right: clamp(20px, 3vw, 40px);
+            width: 60px;
+            height: 60px;
             background: var(--gold);
             border: 3px solid var(--deep-gold);
             border-radius: 50%;
@@ -1285,10 +1429,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.8rem;
+            font-size: clamp(1.4rem, 3vw, 1.8rem);
             transition: all 0.3s ease;
             z-index: 2500;
             box-shadow: 0 0 30px var(--gold);
+            touch-action: manipulation;
+            padding: max(0, env(safe-area-inset-bottom));
         }
 
         .audio-toggle:hover {
@@ -1296,66 +1442,15 @@
             box-shadow: 0 0 60px var(--gold);
         }
 
+        @media (max-width: 768px) {
+            .audio-toggle:active {
+                transform: scale(1.08);
+            }
+        }
+
         .audio-toggle.muted {
             background: transparent;
             color: var(--gold);
-        }
-
-        /* ==================== RESPONSIVE ==================== */
-        @media (max-width: 768px) {
-            .landing-title {
-                font-size: 2.8rem;
-            }
-
-            h1 {
-                font-size: 2.2rem;
-            }
-
-            .houses-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .spell-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .gallery {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .nav-bar {
-                flex-direction: column;
-                gap: 15px;
-                bottom: 20px;
-                padding: 15px 25px;
-            }
-
-            .timeline-item {
-                grid-template-columns: 1fr !important;
-            }
-
-            .timeline-line {
-                left: 25px;
-            }
-
-            .timeline-content {
-                text-align: left !important;
-                grid-column: 1 !important;
-            }
-
-            .timeline-dot {
-                grid-column: 1 !important;
-                justify-self: start;
-                margin-left: 10px;
-            }
-
-            section {
-                padding: 100px 30px;
-            }
-
-            .modal-content {
-                padding: 40px 30px;
-            }
         }
 
         /* ==================== SCROLL REVEAL ==================== */
@@ -1368,6 +1463,27 @@
             opacity: 1;
             transform: translateY(0);
             transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        /* ==================== ACCESSIBILITY ==================== */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* ==================== SAFE AREA ==================== */
+        @supports (padding: max(0px)) {
+            body {
+                padding-left: max(12px, env(safe-area-inset-left));
+                padding-right: max(12px, env(safe-area-inset-right));
+            }
+
+            .nav-bar {
+                padding-bottom: max(10px, env(safe-area-inset-bottom));
+            }
         }
     </style>
 </head>
@@ -1779,17 +1895,15 @@
                 <div class="timeline-items">
                     
                     <div class="timeline-item">
+                        <div class="timeline-dot"></div>
                         <div class="timeline-content">
                             <div class="timeline-year">2001</div>
                             <div class="timeline-title">Philosopher's Stone</div>
                             <div class="timeline-description">The journey begins. Harry discovers his heritage at Hogwarts, making friends that will last a lifetime.</div>
                         </div>
-                        <div class="timeline-dot"></div>
-                        <div></div>
                     </div>
 
                     <div class="timeline-item">
-                        <div></div>
                         <div class="timeline-dot"></div>
                         <div class="timeline-content">
                             <div class="timeline-year">2002</div>
@@ -1799,17 +1913,15 @@
                     </div>
 
                     <div class="timeline-item">
+                        <div class="timeline-dot"></div>
                         <div class="timeline-content">
                             <div class="timeline-year">2004</div>
                             <div class="timeline-title">Prisoner of Azkaban</div>
                             <div class="timeline-description">Sirius Black escapes. Harry learns the truth about his parents and masters the Patronus Charm.</div>
                         </div>
-                        <div class="timeline-dot"></div>
-                        <div></div>
                     </div>
 
                     <div class="timeline-item">
-                        <div></div>
                         <div class="timeline-dot"></div>
                         <div class="timeline-content">
                             <div class="timeline-year">2005</div>
@@ -1819,17 +1931,15 @@
                     </div>
 
                     <div class="timeline-item">
+                        <div class="timeline-dot"></div>
                         <div class="timeline-content">
                             <div class="timeline-year">2007</div>
                             <div class="timeline-title">Order of the Phoenix</div>
                             <div class="timeline-description">A secret resistance forms. Harry leads Dumbledore's Army against rising darkness.</div>
                         </div>
-                        <div class="timeline-dot"></div>
-                        <div></div>
                     </div>
 
                     <div class="timeline-item">
-                        <div></div>
                         <div class="timeline-dot"></div>
                         <div class="timeline-content">
                             <div class="timeline-year">2009</div>
@@ -1839,17 +1949,15 @@
                     </div>
 
                     <div class="timeline-item">
+                        <div class="timeline-dot"></div>
                         <div class="timeline-content">
                             <div class="timeline-year">2010</div>
                             <div class="timeline-title">Deathly Hallows: Part 1</div>
                             <div class="timeline-description">The trio hunts for Horcruxes. The bond of friendship is tested as darkness closes in.</div>
                         </div>
-                        <div class="timeline-dot"></div>
-                        <div></div>
                     </div>
 
                     <div class="timeline-item">
-                        <div></div>
                         <div class="timeline-dot"></div>
                         <div class="timeline-content">
                             <div class="timeline-year">2011</div>
@@ -1898,8 +2006,10 @@
         // ==================== CURSOR EFFECTS ====================
         const wandCursor = document.getElementById('wandCursor');
         let mouseX = 0, mouseY = 0;
+        const isTouch = () => window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 
         document.addEventListener('mousemove', (e) => {
+            if (isTouch()) return;
             mouseX = e.clientX;
             mouseY = e.clientY;
             wandCursor.style.left = mouseX - 10 + 'px';
@@ -1918,6 +2028,8 @@
         });
 
         document.addEventListener('click', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
             playSound(800, 0.1);
             for (let i = 0; i < 15; i++) {
                 const spark = document.createElement('div');
@@ -2020,7 +2132,13 @@
             });
 
             card.addEventListener('mouseenter', function() {
-                createSpellParticles(this);
+                if (!isTouch()) {
+                    createSpellParticles(this);
+                    playSound(600 + Math.random() * 200, 0.2);
+                }
+            });
+
+            card.addEventListener('touchstart', function() {
                 playSound(600 + Math.random() * 200, 0.2);
             });
         });
@@ -2082,61 +2200,61 @@
         // ==================== CHARACTER MODAL ====================
         const characterData = {
             harry: {
-                
+                emoji: '⚡',
                 name: 'Harry James Potter',
                 role: 'The Chosen One',
                 description: 'Born to James and Lily Potter, Harry survived Voldemort\'s killing curse as a baby, making him the most famous wizard of his age. With his signature lightning bolt scar and green eyes, he became a symbol of hope and resistance. Harry\'s unwavering courage, loyalty to his friends, and willingness to sacrifice himself defined his heroic journey.'
             },
             hermione: {
-                
+                emoji: '📚',
                 name: 'Hermione Jean Granger',
                 role: 'Brightest Witch of Her Age',
                 description: 'Born to Muggle parents, Hermione\'s extraordinary intellect and work ethic made her one of the most brilliant witches of her generation. Her strategic mind, vast magical knowledge, and unwavering moral compass were instrumental in the fight against Voldemort. She became a beacon of intelligence and justice in the wizarding world.'
             },
             ron: {
-               
+                emoji: '♟️',
                 name: 'Ronald Bilius Weasley',
                 role: 'Loyal Friend & Strategist',
                 description: 'From a large and loving wizarding family, Ron grew from an insecure boy to a trusted strategist and loyal companion. His chess mastery, quick thinking under pressure, and genuine heart made him invaluable to Harry and Hermione. Ron\'s journey of self-discovery proved that heroism isn\'t always about being the most talented.'
             },
             dumbledore: {
-               
+                emoji: '🧙',
                 name: 'Albus Percival Wulfric Brian Dumbledore',
                 role: 'Headmaster & Mentor',
                 description: 'Widely considered the greatest wizard of all time, Dumbledore\'s wisdom, magical power, and strategic foresight guided the wizarding world through its darkest hours. His deep understanding of love\'s power and ability to see potential in others shaped his role as mentor and leader. His greatest magic was understanding the human heart.'
             },
             snape: {
-               
+                emoji: '🧪',
                 name: 'Severus Tobias Snape',
                 role: 'Master of Potions',
                 description: 'A complex and misunderstood figure, Snape\'s mastery of Potions was unparalleled. His secret love, his double life as a spy, and his ultimate sacrifice revealed a depth of character that transcended his cold exterior. Snape\'s story is one of redemption and the power of love to change us.'
             },
             luna: {
-              
+                emoji: '🌙',
                 name: 'Luna Lovegood',
                 role: 'The Dreamer & Visionary',
                 description: 'Eccentric and wonderfully unique, Luna\'s ability to see beyond the veil made her invaluable in the fight against Voldemort. Her fearless individuality and genuine kindness made her beloved despite others\'s mockery. Luna proved that being different is a strength, not a weakness.'
             },
             draco: {
-              
+                emoji: '🐍',
                 name: 'Draco Lucius Malfoy',
                 role: 'Rival & Adversary',
                 description: 'Born into a dark legacy, Draco\'s journey from arrogant bully to conflicted young man showed his capacity for growth. Though he opposed Harry, his hesitation at crucial moments revealed his inner conflict between family duty and personal morality. Draco\'s redemption arc proved no one is beyond saving.'
             },
             hagrid: {
-           
+                emoji: '🦁',
                 name: 'Rubeus Ignatius Hagrid',
                 role: 'Gamekeeper & Guardian',
                 description: 'A half-giant with a heart as vast as his physical form, Hagrid\'s love for magical creatures and unwavering loyalty to Dumbledore made him a pillar of Hogwarts. His gentle nature, despite his formidable power, and his role in protecting dangerous beasts showed his unique strength. Hagrid\'s journey proved strength lies not in power, but in compassion.'
             },
             ginny: {
-               
+                emoji: '🔥',
                 name: 'Ginevra Molly Weasley',
                 role: 'Seeker & Warrior',
                 description: 'The only Weasley daughter, Ginny overcame possession by a memory of Voldemort to become a fierce Quidditch player and skilled duelist. Her bravery in battle, quick wit, and steady presence made her more than just Ron\'s sister. Ginny\'s strength and independence inspired all those around her.'
             },
             voldemort: {
-                
+                emoji: '💀',
                 name: 'Tom Marvolo Riddle / Lord Voldemort',
                 role: 'The Dark Lord',
                 description: 'Born as Tom Riddle, a brilliant but deeply disturbed orphan, Voldemort became the most feared dark wizard of all time. His obsession with power and immortality led him to create Horcruxes and wage war on the wizarding world. His ultimate defeat by Harry proved that no dark magic could overcome the bonds of friendship and love.'
@@ -2178,6 +2296,12 @@
             });
 
             frame.addEventListener('mouseenter', () => {
+                if (!isTouch()) {
+                    playSound(523.25 + Math.random() * 100, 0.15);
+                }
+            });
+
+            frame.addEventListener('touchstart', () => {
                 playSound(523.25 + Math.random() * 100, 0.15);
             });
         });
@@ -2255,7 +2379,7 @@
                 playSound(784, 0.4);
                 playSound(880, 0.4);
                 const banner = document.createElement('div');
-                banner.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: linear-gradient(135deg, var(--gold), #FFE8A8); padding: 40px 60px; border-radius: 15px; font-family: Cinzel, serif; font-size: 2rem; color: var(--darker-bg); z-index: 9999; box-shadow: 0 0 80px var(--gold); text-align: center;';
+                banner.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: linear-gradient(135deg, var(--gold), #FFE8A8); padding: 40px 60px; border-radius: 15px; font-family: Cinzel, serif; font-size: clamp(1.2rem, 4vw, 2rem); color: var(--darker-bg); z-index: 9999; box-shadow: 0 0 80px var(--gold); text-align: center;';
                 banner.textContent = '🔓 ALOHOMORA! SECRETS UNLOCKED! ✨';
                 document.body.appendChild(banner);
                 setTimeout(() => banner.remove(), 3000);
@@ -2266,6 +2390,7 @@
         // ==================== FLOATING CANDLES ====================
         function createFloatingCandles() {
             const container = document.getElementById('floatingCandles');
+            if (!container) return;
             for (let i = 0; i < 20; i++) {
                 const candle = document.createElement('div');
                 candle.className = 'candle';
@@ -2338,6 +2463,13 @@
         timelineItems.forEach((item) => {
             item.style.opacity = '0';
         });
+
+        // ==================== PERFORMANCE OPTIMIZATION ====================
+        // Reduce animations on low-end devices
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (prefersReducedMotion) {
+            document.documentElement.style.setProperty('--animation-duration', '0.01ms');
+        }
     </script>
 </body>
 </html>
